@@ -218,7 +218,6 @@ void canSend()
 }
 
 
-
 int main() {
     Thread thread;
     thread.start(canSend);//canSend関数を実行
@@ -232,7 +231,7 @@ int main() {
     while (true) {
         readUntilPipe(output_buf, sizeof(output_buf)); // '|'が受け取られるまでデータを読み込み
         // おむに停止する
-        if (strncmp(output_buf, "pause", 5) == 0) 
+        if (strncmp(output_buf, "cross", 5) == 0) 
         {
             pwm[0] = 0;
             pwm[1] = 0;
@@ -240,6 +239,20 @@ int main() {
         }
         // 回収停止
         else if (strncmp(output_buf, "release", 7) == 0)
+        {
+            penguin.pwm[0] = 0;
+            penguin.pwm[1] = 0;
+            penguin.pwm[2] = 0;
+            penguin.pwm[3] = 0;
+        }
+        else if (strncmp(output_buf, "R1OFF", 5) == 0)
+        {
+            penguin.pwm[0] = 0;
+            penguin.pwm[1] = 0;
+            penguin.pwm[2] = 0;
+            penguin.pwm[3] = 0;
+        }
+        else if (strncmp(output_buf, "L1OFF", 5) == 0)
         {
             penguin.pwm[0] = 0;
             penguin.pwm[1] = 0;
