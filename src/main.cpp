@@ -3,6 +3,8 @@
 #include <cmath>
 #include <firstpenguin.hpp>
 #include <algorithm>
+#include <chrono>
+#include <thread>
 
 int16_t pwm[3] = {0, 0, 0}; // それぞれの出力
 double theta = 0; // PS4コントローラーの左スティックの角度
@@ -14,6 +16,8 @@ uint8_t DATA[8] = {};
 float speed = 0;
 float speed_change = -0.1;
 float rotation_change = 0.03;
+//ジャンプのための出力
+float jump = 0;
 
 constexpr uint32_t penguinID = 35;
 
@@ -205,6 +209,10 @@ void canSend()
         DATA[4] = outputLeft16 >> 8;   // MSB
         DATA[5] = outputLeft16 & 0xFF; // LSB
 
+        int16_t outputJumpInt16 = static_cast<int16_t>(jump);
+        DATA[6] = outputJumpInt16 >> 8;   // MSB
+        DATA[7] = outputJumpInt16 & 0xFF; // LSB
+
         CANMessage msg0(0x200, DATA, 8);
         can.write(msg0);
         penguin.send();
@@ -214,6 +222,7 @@ void canSend()
         // else{
         //     printf("no\n");
         // }
+        ThisThread::sleep_for(50ms);
     }
 }
 
@@ -247,17 +256,11 @@ int main() {
         }
         else if (strncmp(output_buf, "R1OFF", 5) == 0)
         {
-            penguin.pwm[0] = 0;
-            penguin.pwm[1] = 0;
-            penguin.pwm[2] = 0;
-            penguin.pwm[3] = 0;
+            jump = 0;
         }
         else if (strncmp(output_buf, "L1OFF", 5) == 0)
         {
-            penguin.pwm[0] = 0;
-            penguin.pwm[1] = 0;
-            penguin.pwm[2] = 0;
-            penguin.pwm[3] = 0;
+            jump = 0;
         }
         // おむに制御
         else if (strncmp(output_buf, "L3_x:", 5) == 0) // "L3_x:"という文字列で始まるか確認
@@ -322,17 +325,11 @@ int main() {
         // ジャンプ機構
         else if (strncmp(output_buf, "L1ON", 4) == 0)
         {
-            penguin.pwm[0] = 0;
-            penguin.pwm[1] = 0;
-            penguin.pwm[2] = 0;
-            penguin.pwm[3] = 2000;
+            jump = 10000;
         }
         else if (strncmp(output_buf, "R1ON", 4) == 0)
         {
-            penguin.pwm[0] = 0;
-            penguin.pwm[1] = 0;
-            penguin.pwm[2] = 0;
-            penguin.pwm[3] = -2000;
+            jump = -10000;
         }
 
         theta = atan2(L_y, L_x); // ラジアンで
