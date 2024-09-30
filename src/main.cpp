@@ -15,7 +15,7 @@ double R_y; // PS4コントローラーの右スティックのy座標
 uint8_t DATA[8] = {};
 float speed = 0;
 float speed_change = -0.1;
-float rotation_change = 0.03;
+float rotation_change = -0.03;
 //ジャンプのための出力
 float jump = 0;
 
